@@ -1,0 +1,106 @@
+#include <ArduinoBLE.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h> // a modifié selon le capteur utilisé
+
+#define BME_SDA 4 //bus de données
+#define BME_SCL 5 //bus de l’horloge
+
+BLEService sensorService("19B10002-E8F2-537E-4F6C-D104768A1214"); // service du capteur
+BLEFloatCharacteristic pressureCharacteristic("5364e780-99b4-45f7-8711-785bba88465d", BLERead); //Caractéristique pression
+BLEByteCharacteristic ledCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead); //Caractéristique led
+BLEUnsignedCharCharacteristic batteryCharacteristic("2A19", BLERead); //Caractéristique batterie
+
+BLEDescriptor LedDescriptor("2901","led"); //Descripteur led
+BLEDescriptor PressureDescriptor("2901","pressure");  //Descritpeur pression
+BLEDescriptor batteryDescriptor("2901","battery");//Descripteur batterie
+
+const int ledPin = LED_BUILTIN; // Pin de la led
+
+unsigned long previousMillis = 0; 
+const long interval = 10000;  // intervalle de 10 secondes
+Adafruit_BME280 bme; // initialisation du capteur
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+
+  // Set LED pin to output mode
+  pinMode(ledPin, OUTPUT);
+
+  // Initialisation communication  I2C 
+  Wire.begin();
+
+  // Initialisation BME280 sensor
+  if (!bme.begin(0x76)) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    while (1);
+  }
+  Serial.println("BME280 sensor initialized!");
+
+  // Initialisation BLE
+  if (!BLE.begin()) {
+    Serial.println("Starting Bluetooth® Low Energy module failed!");
+    while (1);
+  }
+  //Ajouter les descripteurs aux caractéristiques
+  ledCharacteristic.addDescriptor(LedDescriptor);
+  pressureCharacteristic.addDescriptor(SensorDescriptor);
+  batteryCharacteristic.addDescriptor(batteryDescriptor);
+  // Initialsation du nom
+  BLE.setLocalName("me");
+  BLE.setAdvertisedService(sensorService);
+
+ // Ajouter les caractéristiques au services
+  sensorService.addCharacteristic(ledCharacteristic);
+  sensorService.addCharacteristic(pressureCharacteristic);
+  sensorService.addCharacteristic(batteryCharacteristic);
+  
+  BLE.addService(sensorService);//Ajout du service
+  ledCharacteristic.writeValue(0);
+  digitalWrite(ledPin, HIGH);  // Start advertising
+  BLE.advertise();
+  Serial.println("me Peripheral ready");
+}
+
+
+void loop() {
+  // Ecouter les périphérique en BLE
+  BLEDevice central = BLE.central();
+
+  //si un périphérique est connecté
+  if (central) {
+    Serial.print("Connected to central: ");
+    Serial.println(central.address());//afficher l’adresse du périphérique
+    
+    // tant que le périphérique est connecté
+    while (central.connected()) {
+      unsigned long currentMillis = millis();//initialise le compteur
+      if (currentMillis - previousMillis >= interval) {// si l’intervalle de temps est passé
+        // Enregistrer le temps actuel
+        previousMillis = currentMillis;
+        float pressure = bme.readPressure();// on récupère la valeur du capteur
+        pressureCharacteristic.writeValue(round(pressure));// on envoie la valeur sur la caractérisique
+        digitalWrite(ledPin, LOW);// on allume la led pour montrer qu’on a envoyé une donnée
+        Serial.println(round(pressure));
+        delay(1000);
+        digitalWrite(ledPin, HIGH);
+
+        int batteryLevel = getBatteryLevel();//On recupère la valeur de la batterie
+        batteryCharacteristic.writeValue(batteryLevel);//On envoie la valeur sur la caractéristique
+      }
+    }
+
+    //Lorsque le périphérique est deconnecté
+    Serial.print(F("Disconnected from central: "));
+    Serial.println(central.address());
+  }
+}
+#define VBAT_MV_PER_LBS (0.003515625F)
+// fonction pour récupérer l'état de la batterie
+int getBatteryLevel() {
+  float battery= analogRead(PIN_VBAT);
+  int BatteryLevel = map(battery, 0, 1023, 0, 100);//on convertie en pourcentage
+  Serial.println(BatteryLevel);
+  return BatteryLevel;
+}

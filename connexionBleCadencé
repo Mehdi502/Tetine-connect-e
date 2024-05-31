@@ -1,0 +1,93 @@
+#include <ArduinoBLE.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
+#define BME_SDA 4
+#define BME_SCL 5
+
+BLEService sensorService("19B10002-E8F2-537E-4F6C-D104768A1214"); //Capteur service
+
+BLEFloatCharacteristic pressureCharacteristic("5364e780-99b4-45f7-8711-785bba88465d", BLERead); //Caractéristique de pression
+BLEByteCharacteristic ledCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead);//Caractéristique de la led
+BLEDescriptor LedDescriptor("2901","led");//Descripteur de la led
+BLEDescriptor SensorDescriptor("2901","pression");  //Descripteur de la pression
+
+const int ledPin = LED_BUILTIN; // pin de la led
+
+unsigned long previousMillis = 0;
+const long interval = 10000;  // intervalle de 10 secondes
+Adafruit_BME280 bme; //Créer l'instance du capteur
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+
+  pinMode(ledPin, OUTPUT);
+
+  // Initialisation I2C communication
+  Wire.begin();
+
+  // Initialisation BME280 sensor
+  if (!bme.begin(0x76)) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    while (1);
+  }
+  Serial.println("BME280 sensor initialized!");
+
+  // Initialisation BLE
+  if (!BLE.begin()) {
+    Serial.println("Starting Bluetooth® Low Energy module failed!");
+    while (1);
+  }
+  // Ajout des descripteurs
+  ledCharacteristic.addDescriptor(LedDescriptor);
+  pressureCharacteristic.addDescriptor(SensorDescriptor);
+
+  //Definir un nom 
+  BLE.setLocalName("te");
+  BLE.setAdvertisedService(sensorService);
+  //Ajouter les caractéristiques
+  sensorService.addCharacteristic(ledCharacteristic);
+  sensorService.addCharacteristic(pressureCharacteristic);
+  //Ajouter le service
+  BLE.addService(sensorService);
+  // Set the initial value for the characeristic:
+  ledCharacteristic.writeValue(0);
+  digitalWrite(ledPin, HIGH);  // Start advertising
+  BLE.advertise();
+  Serial.println("te Peripheral ready");
+}
+
+
+void loop() {
+  // Ecouter les périphérique en BLE
+  BLEDevice central = BLE.central();
+
+  
+  if (central) {// si un périphérique est connecté
+    Serial.print("Connected to central: ");
+    //afficher l’adresse du périphérique
+    Serial.println(central.address());
+    
+    // tant que le périphérique est connecté
+    while (central.connected()) {
+      unsigned long currentMillis = millis();//initialise le compteur
+
+      if (currentMillis - previousMillis >= interval) {// si l’intervalle de temps est passé
+        // Enregistrer le temps actuel
+        previousMillis = currentMillis;
+        float pressure = bme.readPressure();// on récupère la Valeur du capteur
+        pressureCharacteristic.writeValue(round(pressure));// on envoie la Valeur sur la caractérisique
+        digitalWrite(ledPin, LOW);// on allume la led pour montrer qu’on a envoyé une donnée
+        Serial.println(round(pressure));
+        delay(1000);
+        digitalWrite(ledPin, HIGH);
+      }
+    }
+
+    //Lorsque le périphérique est déconnecté
+    Serial.print(F("Disconnected from central: "));
+    Serial.println(central.address());
+  }
+}

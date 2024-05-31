@@ -1,0 +1,47 @@
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
+
+#define BME_SDA 4//bus de données
+#define BME_SCL 5//bus de l'horloge
+#define BME280_ADDR 0x76 // Adresse I2C du capteur BME280
+
+Adafruit_BME280 bme; //Init capteur
+
+void setup() {
+  
+  Serial.begin(9600);
+  while (!Serial){};
+  Serial.println("Hello.. Baud fixed and serial ready");
+
+  Wire.begin(); // Démarre la communication I2C
+  if (!bme.begin(BME280_ADDR)) {
+   Serial.println("Impossible d'initialiser le capteur BME280");
+    while (1);
+  }
+
+  Serial.println("En attente de lecture des données du capteur BME280...");
+}
+
+void loop() {
+  
+  delay(1000);
+  float temperature = bme.readTemperature();
+  float pressure = bme.readPressure() /100; // Conversion de pascals à hectopascals (hPa)
+  float humidity = bme.readHumidity();
+
+  // Affiche les données sur le port série
+    Serial.print("Température : ");
+    Serial.print(temperature);
+    Serial.println(" °C");
+
+    Serial.print("Pression : ");
+    Serial.println(pressure);
+    Serial.println(" hPa");
+
+    Serial.print("Humidité : ");
+    Serial.print(humidity);
+    Serial.println(" %");
+
+    delay(1000); // Attendre une seconde
+}
