@@ -1,0 +1,124 @@
+/* Styles pour l'en-tête */
+div[data-role="header"] {
+    background-color: #1fddfac2; /* Bleu */
+    position: relative; 
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+}
+
+/* Styles pour le contenu principal */
+div[data-role="content"] {
+    padding: 15px;
+}
+
+body{
+    font-family: "Helvetica", sans-serif;
+}
+
+/* Styles pour le groupe de contrôle */
+div[data-role="controlgroup"] {
+    text-align: center;
+    margin-top: 20px;
+}
+div[data-role="connexion"] {
+    font-family: "Helvetica", sans-serif;
+    text-align: center;
+    margin-top: 20px;
+}
+/* Styles pour le sélecteur */
+select {
+    cursor: pointer;
+}
+#logosmap {
+    position: absolute;
+    right: 0px;
+    height: 100%;
+    width: auto;
+    margin-right: auto;
+    flex-wrap: 1;
+}
+#logousmb {
+    position: absolute;
+    left: 10px;
+    height: 80%;
+    width: auto;
+    margin-left: auto;
+    flex-wrap: 1;
+}
+h1 {
+    text-align: center;
+    flex-grow: 1;
+    
+}
+#descriptionprojet{
+    text-align:justify;
+    font-size: 18px;
+    
+
+}
+#tetine{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width:auto;
+
+}
+
+#connectionStatus {
+  font-size: 18px; /* Taille de la police */
+  color: #333; /* Couleur du texte */
+  margin-top: 20px; /* Marge supérieure */
+  display: inline-block; /* Affichage en ligne bloc */
+}
+
+select {
+  padding: 10px;
+  font-size: 16px;
+  margin: 5px;
+  display: inline-block; /* Affichage en ligne bloc */
+}
+
+p{
+    font-size: 18px;
+    text-align: center;
+}
+
+
+
+button{
+    border: none; /* Supprime les bordures */
+    color: white; /* Couleur du texte */
+    width: 200px; /* Largeur fixe */
+    height: 50px; /* Hauteur fixe */
+    padding: 10px;
+    text-align: center; /* Alignement du texte */
+    text-decoration: none; /* Supprime la décoration du texte */
+    display: inline-block; /* Affichage en ligne */
+    font-size: 90%; /* Taille de la police */
+    margin: 4px; /* Marge extérieure */
+    cursor: pointer; /* Curseur au survol */
+    border-radius: 5px; /* Rayon des bords */
+}
+
+#deconnectButton{
+    background-color: #af4c4c; /* Couleur de fond */
+
+}
+#connectButton{
+    background-color: #54af4c; /* Couleur de fond */
+}
+#donnees{
+    background-color: #4ca3af; /* Couleur de fond */
+
+}
+#dataDisplay{
+    font-size:16px;
+}
+#connectionTime{
+    font-size:16px;
+}
+#acquisitionTime{
+    font-size:16px;
+}
+

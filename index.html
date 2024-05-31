@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <link rel="stylesheet"  href="css/jquery.mobile-1.4.5.min.css">
+		<link rel="stylesheet"  href="css/index.css">
+		<script src="js/jquery-1.8.0.min.js"></script>
+		<script  src="js/jquery.mobile-1.4.5.min.js"></script>
+        
+        <title>SMAP</title>
+    </head>
+    <body>
+        <div data-role=page id=home>
+			    <div data-role=header >
+                    <img id=logosmap src="img/SMAP.png" alt="smap"> 
+                    <img id=logousmb src="img/Polytech.png" alt="usmb"> 
+				    <h1>SMAP</h1>
+				</div>
+				<div data-role=content>
+                    <p id="descriptionprojet">Le but de ce projet est de développer une tétine intelligente  pour nourrisson. Elle permet de fournir une
+                        mesure objective, à bas coût et en ambulatoire, de paramètres vitaux du nourrisson avant une séance de kinésithérapie voire
+                        d’une hospitalisation. La tétine contient un capteur de pression, une batterie et un module de communication sans fil BLE. </p>
+					<img id="tetine" src="img/tetine.png">
+					<p id="text">Veuillez sélectionner la tétine que vous utilisez :</p>
+					
+					<div data-role=controlgroup data-type=horizontal>
+
+							<select id='channel'>
+								<option value='0' selected>Tétine me</option>
+								<option value='1'>Tétine te</option>
+								<option value='2'>autre</option>
+							</select>
+							<p id="connectionStatus">Connection status: Disconnected</p>	
+							<div id="Scan" style="display :none;" >
+								<select id="deviceSelect">
+									<option value="">Select a Device</option>
+								</select>
+							</div>
+					</div>
+					<div data-role="connexion" data_type=horizontal>
+						<button id="connectButton">Connexion</button>
+                        <button id="donnees">Afficher les données</button>
+						<button id="deconnectButton">Deconnexion</button>
+                        <div>
+                            <p id="connectionTime">Temps de connexion : </p>
+                            <p id="acquisitionTime">Temps d'acquisition de la donnée : </p>
+                        </div>
+						
+            			
+            			<p id="dataDisplay">Dernière donnée enregistrée : </p>
+                        <table id="data-table">
+                            
+                            <tbody id="tableurDisplay">
+                                
+                            </tbody>
+                        </table>
+                        <canvas id="mygraph"></canvas>
+                        <p id="battery">Niveau de batterie : </p>
+					</div>
+                    
+		</div>
+		<script>
+			if (window.jQuery) {  
+				// jQuery is loaded  
+				alert("jQuery is loaded");
+			} else {
+				// jQuery is not loaded
+				alert("jQuery is not loaded");
+			}
+		</script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/IndexV6.js"></script>
